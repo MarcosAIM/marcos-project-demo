@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "marcos-project-demo": {
+      "hosting": {
+        "CoinsAndStocks": [
+          "marcos-project-demo"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "marcos-project-demo"
+  }
+}
