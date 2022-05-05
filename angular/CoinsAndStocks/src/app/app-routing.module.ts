@@ -6,7 +6,7 @@ import { RegisterComponent } from "./components/register/register.component";
 // route guard
 import { AuthGuard } from './shared/guard/auth.guard';
 const routes: Routes = [
-  {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
+  {path: '', redirectTo: '/register', pathMatch: 'full'},
   {path: 'register', component:RegisterComponent},
   {path: 'login', component:LoginComponent},
   {path: 'dashboard', component:DashboardComponent, canActivate:[AuthGuard]},

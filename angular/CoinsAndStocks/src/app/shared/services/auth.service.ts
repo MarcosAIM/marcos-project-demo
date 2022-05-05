@@ -21,15 +21,26 @@ export class AuthService {
     public ngZone: NgZone
   ) {
     this.aFireAuth.authState.subscribe((player)=>{
-      this.playerData = player;
+      if(player){
+        this.playerData = player;
+      }
+      else{
+        this.playerData = null;
+      }
     })
    }
 
-    // Sign in with email/password
+    // Log In with email/password
   async LogIn(email: string, password: string) {
     try {
       const response = await this.aFireAuth
-        .signInWithEmailAndPassword(email, password);
+        .signInWithEmailAndPassword(email, password).then((player)=>{
+          this.playerData = {
+            player_id: player.user?.uid,
+            email: player.user?.email
+          }
+          console.log(this.playerData);
+        });
       this.ngZone.run(() => {
         this.router.navigate(['dashboard']);
       });
@@ -37,26 +48,37 @@ export class AuthService {
       window.alert(error.message);
     }
   }
-    // Sign up with email/password
+    // Register with email/password
     async Register(email: string, password: string) {
       try {
         const response = await this.aFireAuth
-          .createUserWithEmailAndPassword(email, password);
+          .createUserWithEmailAndPassword(email, password).then((player)=>{
+            this.playerData = {
+              player_id: player.user?.uid,
+              email: player.user?.email
+            }
+            console.log(this.playerData);
+          });
+
+          this.ngZone.run(() => {
+            this.router.navigate(['dashboard']);
+          });
       } catch (error:any) {
 
         window.alert(error.message);
       }
     }
 
-      // Sign out
+      // Log out
   async LogOut() {
     return await this.aFireAuth.signOut().then(()=>{
       this.router.navigate(['register']);
+      this.playerData = null;
+      console.log(this.playerData);
     });
   }
 
   get isLoggedIn(): boolean {
-    const player = this.playerData
-    return (player !== null) ? true : false;
+    return (this.playerData !== null) ? true : false;
   }
 }

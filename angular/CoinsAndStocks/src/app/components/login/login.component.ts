@@ -8,21 +8,21 @@ import { AuthService } from "../../shared/services/auth.service";
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup
+  formLogIn: FormGroup
   constructor(
     private authService: AuthService,
     private router: Router,
     private activeRoute: ActivatedRoute,
     private formBuilder: FormBuilder
   ) {
-    this.form = formBuilder.group({
+    this.formLogIn = formBuilder.group({
       email: ['', Validators.required],
       password: ['', Validators.required]
     })
    }
 
    logIn() {
-    return this.authService.LogIn(this.form.value.email, this.form.value.password);
+    return this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password);
   }
 
   ngOnInit(): void {

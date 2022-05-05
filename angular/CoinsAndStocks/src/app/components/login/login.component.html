@@ -1,6 +1,6 @@
 
 <h2>Login</h2>
-<form autocomplete="off" novalidate class="login-form" [formGroup]="form">
+<form autocomplete="off" novalidate class="login-form" [formGroup]="formLogIn">
   <div>
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
@@ -13,7 +13,11 @@
           <input matInput type="password" formControlName="password">
       </mat-form-field>
   </div>
-
   <button mat-raised-button (click)="logIn()">Login</button>
 </form>
+<div class="redirectToLogin">
+  <span>Need an Account?
+    <span class="redirect" routerLink="/register">Register</span>
+  </span>
+</div>
 
