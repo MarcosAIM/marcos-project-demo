@@ -23,11 +23,10 @@ export class RegisterComponent implements OnInit {
   })
 }
 
-  register() {
-    return this.authService.Register(this.formRegister.value.email, this.formRegister.value.password).then(()=>{
-      this.ngZone.run(() => {
-        this.router.navigate(['dashboard']);
-      });
+  async register() {
+    await this.authService.Register(this.formRegister.value.email, this.formRegister.value.password);
+    this.ngZone.run(() => {
+      this.router.navigate(['dashboard']);
     });
   }
 
