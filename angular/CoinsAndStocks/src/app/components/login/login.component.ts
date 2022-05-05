@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { AuthService } from "../../shared/services/auth.service";
@@ -13,6 +13,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private activeRoute: ActivatedRoute,
+    public ngZone: NgZone,
     private formBuilder: FormBuilder
   ) {
     this.formLogIn = formBuilder.group({
@@ -22,7 +23,11 @@ export class LoginComponent implements OnInit {
    }
 
    logIn() {
-    return this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password);
+    return this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password).then(()=>{
+      this.ngZone.run(() => {
+        this.router.navigate(['dashboard']);
+      });
+    });
   }
 
   ngOnInit(): void {

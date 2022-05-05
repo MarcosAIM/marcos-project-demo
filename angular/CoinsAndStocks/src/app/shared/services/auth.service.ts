@@ -41,9 +41,7 @@ export class AuthService {
           }
           console.log(this.playerData);
         });
-      this.ngZone.run(() => {
-        this.router.navigate(['dashboard']);
-      });
+
     } catch (error:any) {
       window.alert(error.message);
     }
@@ -58,11 +56,9 @@ export class AuthService {
               email: player.user?.email
             }
             console.log(this.playerData);
+
           });
 
-          this.ngZone.run(() => {
-            this.router.navigate(['dashboard']);
-          });
       } catch (error:any) {
 
         window.alert(error.message);
