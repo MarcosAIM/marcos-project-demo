@@ -1,23 +1,19 @@
 
+<h2>Login</h2>
+<form autocomplete="off" novalidate class="login-form" [formGroup]="form">
+  <div>
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+        <input matInput formControlName="email">
+    </mat-form-field>
+  </div>
+  <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password">
+      </mat-form-field>
+  </div>
 
-  <div class="displayTable">
-    <div class="displayTableCell">
-      <div class="authBlock">
-        <h3>Register</h3>
-        <div class="formGroup">
-          <input type="text" class="formControl" placeholder="Username" #userName required>
-        </div>
-        <div class="formGroup">
-          <input type="password" class="formControl" placeholder="Password" #userPassword required>
-        </div>
-        <!-- Calling SignIn Api from AuthService -->
-        <div class="formGroup">
-          <input type="button" class="btn btnPrimary" value="Log in" (click)="authService.LogIn(userName.value, userPassword.value)">
-        </div>
-        <div class="formGroup">
-          <span class="or"><span class="orInner">Or</span></span>
-        </div>
-    </div>
-</div>
-
+  <button mat-raised-button (click)="logIn()">Login</button>
+</form>
 
