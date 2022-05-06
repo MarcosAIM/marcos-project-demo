@@ -12,9 +12,9 @@
                 <i class="fas fa-user"></i>User Profile
               </a>
             </li>
-            <!-- Calling SignOut() Api from AuthService -->
+            <!-- LogOut-->
             <li class="nav-item">
-              <a class="nav-link" (click)="authService.LogOut()">
+              <a class="nav-link" (click)="onLogOut()">
                 <i class="fas fa-sign-out-alt"></i>Log out
               </a>
             </li>
@@ -28,13 +28,13 @@
             <h1 class="h2">User Profile</h1>
           </div>
           <!-- Show user data when logged in -->
-          <div class="row" *ngIf="authService.playerData as player">
+          <div class="row" *ngIf="playerService.playerData as player">
             <div class="col-md-12">
               <div class="media">
                 <div class="media-body">
                   <h1>Hello: <strong>{{(player.displayName) ? player.displayName : 'User'}}</strong></h1>
-                  <p>User ID: <strong>{{player.uid}}</strong></p>
                   <p>Email: <strong>{{player.email}}</strong></p>
+                  <p>Coins: <strong>{{player.coins}}</strong></p>
                 </div>
               </div>
             </div>

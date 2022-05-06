@@ -1,5 +1,5 @@
 export interface Player {
-    player_id: string
+    displayName: string
     email: string
     coins:number,
     stocks: Map<string,number>

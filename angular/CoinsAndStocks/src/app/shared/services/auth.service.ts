@@ -1,104 +1,81 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Player } from '../player';
-import * as auth from 'firebase/auth';
+import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import {
-  AngularFirestore,
-  AngularFirestoreDocument,
-} from '@angular/fire/compat/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
-import { switchMap, Subject } from 'rxjs';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  playerData: any;
+  private playerId: string|any;
   constructor(
-    public aFirestore: AngularFirestore,
-    public aFireAuth: AngularFireAuth,
-    public router: Router,
-    public ngZone: NgZone
+    private aFirestore: AngularFirestore,
+    private aFireAuth: AngularFireAuth,
+    private router: Router,
   ) {
-    this.aFireAuth.authState.subscribe((player)=>{
-      if(player){
-        this.playerData = player;
-      }
-      else{
-        this.playerData = null;
+    var that = this;
+    this.aFireAuth.user.subscribe({
+      next(player) {
+        if (player) {
+          that.playerId = player.uid;
+        } else {
+          that.playerId = undefined;
+        }
       }
     })
    }
 
     // Log In with email/password
-  async LogIn(email: string, password: string) {
+   LogIn(email: string, password: string) {
     try {
-      const response = await this.aFireAuth
-        .signInWithEmailAndPassword(email, password).then((player)=>{
-          if(player.user?.uid){
-            this.playerData = {
-              player_id: player.user?.uid,
-              email: player.user?.email
-            }
-            this.getPlayer().next(this.playerData.player_id);
-          }
+        this.aFireAuth
+        .signInWithEmailAndPassword(email, password)
+        .then((player)=>{
+          this.playerId = player.user?.uid;
         });
-
-    } catch (error:any) {
+    } 
+    catch (error:any) {
       window.alert(error.message);
     }
   }
 
-
     // Register with email/password
-    async Register(email: string, password: string) {
+    Register(email: string, password: string) {
       try {
-          await this.aFireAuth
+          this.aFireAuth
           .createUserWithEmailAndPassword(email, password).then((player)=>{
-            this.playerData = {
+            const newPlayerProfile = {
               player_id: player.user?.uid,
+              display_name: "Koala",
               email: player.user?.email,
               coins: 100000,
               stocks: {}
             }
-            this.aFirestore.collection('players').add(this.playerData)
+            this.playerId = player.user?.uid;
+            this.aFirestore.collection('players').add(newPlayerProfile);
           });
 
-      } catch (error:any) {
-
+      } 
+      catch (error:any) {
         window.alert(error.message);
       }
     }
 
-      // Log out
-  async LogOut() {
-    return await this.aFireAuth.signOut().then(()=>{
+  // Log out
+   LogOut() {
+     console.log(this.playerId);
+      this.aFireAuth.signOut().then(()=>{
       this.router.navigate(['register']);
-      this.playerData = null;
-      console.log(this.playerData);
+      this.playerId = null;
     });
   }
 
   get isLoggedIn(): boolean {
-    return (this.playerData !== null) ? true : false;
+    return (this.aFireAuth.currentUser !== null) ? true : false;
   }
 
-  getPlayer(){
-    const player_id$ = new Subject<string>();
-    const queryObservable = player_id$.pipe(
-    switchMap(player_id => 
-      this.aFirestore
-      .collection('players', ref => ref.where('player_id', '==', player_id))
-      .valueChanges()
-    )
-    );
-
-    // subscribe to changes
-    queryObservable.subscribe(queriedItems => {
-      console.log(queriedItems);  
-    });
-
-    return player_id$;
+  get getPlayerId(): string|any{
+    return this.playerId;
   }
+
 }
