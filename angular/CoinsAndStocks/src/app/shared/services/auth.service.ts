@@ -7,6 +7,7 @@ import {
   AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
+import { switchMap, Subject } from 'rxjs';
 
 
 @Injectable({
@@ -35,28 +36,33 @@ export class AuthService {
     try {
       const response = await this.aFireAuth
         .signInWithEmailAndPassword(email, password).then((player)=>{
-          this.playerData = {
-            player_id: player.user?.uid,
-            email: player.user?.email
+          if(player.user?.uid){
+            this.playerData = {
+              player_id: player.user?.uid,
+              email: player.user?.email
+            }
+            this.getPlayer().next(this.playerData.player_id);
           }
-          console.log(this.playerData);
         });
 
     } catch (error:any) {
       window.alert(error.message);
     }
   }
+
+
     // Register with email/password
     async Register(email: string, password: string) {
       try {
-        const response = await this.aFireAuth
+          await this.aFireAuth
           .createUserWithEmailAndPassword(email, password).then((player)=>{
             this.playerData = {
               player_id: player.user?.uid,
-              email: player.user?.email
+              email: player.user?.email,
+              coins: 100000,
+              stocks: {}
             }
-            console.log(this.playerData);
-
+            this.aFirestore.collection('players').add(this.playerData)
           });
 
       } catch (error:any) {
@@ -76,5 +82,23 @@ export class AuthService {
 
   get isLoggedIn(): boolean {
     return (this.playerData !== null) ? true : false;
+  }
+
+  getPlayer(){
+    const player_id$ = new Subject<string>();
+    const queryObservable = player_id$.pipe(
+    switchMap(player_id => 
+      this.aFirestore
+      .collection('players', ref => ref.where('player_id', '==', player_id))
+      .valueChanges()
+    )
+    );
+
+    // subscribe to changes
+    queryObservable.subscribe(queriedItems => {
+      console.log(queriedItems);  
+    });
+
+    return player_id$;
   }
 }
