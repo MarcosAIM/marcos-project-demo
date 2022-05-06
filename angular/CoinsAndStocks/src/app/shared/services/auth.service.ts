@@ -46,15 +46,14 @@ export class AuthService {
           .createUserWithEmailAndPassword(email, password).then((player)=>{
             const newPlayerProfile = {
               player_id: player.user?.uid,
-              display_name: "Koala",
+              displayName: "Koala",
               email: player.user?.email,
               coins: 100000,
-              stocks: {}
+              stocks: []
             }
             this.playerId = player.user?.uid;
-            this.aFirestore.collection('players').add(newPlayerProfile);
+            this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile);
           });
-
       } 
       catch (error:any) {
         window.alert(error.message);

@@ -9,41 +9,33 @@ import { AuthService } from "./auth.service";
 })
 export class PlayerService {
   playerData:any;
-  playerObserve: Subject<string>;
 
   constructor(
     private aFirestore: AngularFirestore,
     private authService: AuthService,
 
   ) {
-    this.playerObserve = this.PlayerObserveInit();
-    this.playerUpdate();
+    this.PlayerObserveInit();
   }
 
   PlayerObserveInit(){
-      const player_id$ = new Subject<string>();
-      const queryObservable = player_id$.pipe(
-      switchMap(player_id => 
-        this.aFirestore
-        .collection('players', ref => ref.where('player_id', '==', player_id))
-        .valueChanges()
-      )
-     );
+      const playerObservable = this.aFirestore.collection('players')
+      .doc(this.authService.getPlayerId)
+      .valueChanges();
       // subscribe to changes
-      queryObservable.subscribe(queriedItems => {
-        const playerQuery = queriedItems.pop() as Player;
-        this.playerData = {
-          coins: playerQuery.coins,
-          email: playerQuery.email,
-          displayName: playerQuery.displayName,
-          stocks: playerQuery.stocks
+      const that = this;
+      playerObservable.subscribe(
+        {next(player){
+          const playerQuery = player as Player;
+          that.playerData = {
+            coins: playerQuery.coins,
+            email: playerQuery.email,
+            displayName: playerQuery.displayName,
+            stocks: playerQuery.stocks
+          }
         }
-      });
-      return player_id$;
-  }
-
-  playerUpdate(){
-    this.playerObserve.next(this.authService.getPlayerId);
+      }
+    );
   }
 
   clearPlayerData(){
