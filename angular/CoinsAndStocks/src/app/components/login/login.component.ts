@@ -22,12 +22,11 @@ export class LoginComponent implements OnInit {
     })
    }
 
-   async logIn() {
-    await this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password);
-     this.ngZone.run(() => {
-       this.router.navigate(['dashboard']);
-     });
-  }
+  logIn() {
+    return this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password)
+    .then(res =>  this.router.navigateByUrl(
+      this.activeRoute.snapshot.paramMap.get('callbackUrl') || 'dashboard'))
+}
 
   ngOnInit(): void {
   }

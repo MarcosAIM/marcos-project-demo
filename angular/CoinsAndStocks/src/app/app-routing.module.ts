@@ -10,7 +10,7 @@ const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
-  {path: 'register', component:RegisterComponent, ...canActivate(redirectLoggedInToDashboard) },
+  {path: 'register', component:RegisterComponent, ...canActivate(redirectLoggedInToDashboard)},
   {path: 'login', component:LoginComponent,  ...canActivate(redirectLoggedInToDashboard)},
   {path: 'dashboard', component:DashboardComponent, ...canActivate(redirectUnauthorizedToLogin)},
 ];

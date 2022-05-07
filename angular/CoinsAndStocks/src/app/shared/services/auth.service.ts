@@ -27,23 +27,20 @@ export class AuthService {
 
     // Log In with email/password
    LogIn(email: string, password: string) {
-    try {
-        this.aFireAuth
-        .signInWithEmailAndPassword(email, password)
+    return this.aFireAuth.signInWithEmailAndPassword(email, password)
         .then((player)=>{
           this.playerId = player.user?.uid;
-        });
-    } 
-    catch (error:any) {
+        }) 
+    .catch ((error) => {
       window.alert(error.message);
-    }
+    });
   }
 
     // Register with email/password
     Register(email: string, password: string) {
-      try {
-          this.aFireAuth
-          .createUserWithEmailAndPassword(email, password).then((player)=>{
+      return this.aFireAuth
+          .createUserWithEmailAndPassword(email, password)
+          .then((player)=>{
             const newPlayerProfile = {
               player_id: player.user?.uid,
               displayName: "Koala",
@@ -53,19 +50,18 @@ export class AuthService {
             }
             this.playerId = player.user?.uid;
             this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile);
-          });
-      } 
-      catch (error:any) {
+          })
+      .catch((error) => {
         window.alert(error.message);
-      }
+      });
     }
 
   // Log out
    LogOut() {
-     console.log(this.playerId);
-      this.aFireAuth.signOut().then(()=>{
-      this.router.navigate(['register']);
-      this.playerId = null;
+    return this.aFireAuth.signOut()
+    .then(res => this.playerId = null)
+    .catch((error) => {
+      window.alert(error.message);
     });
   }
 
