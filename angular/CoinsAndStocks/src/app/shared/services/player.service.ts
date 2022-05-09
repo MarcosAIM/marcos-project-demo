@@ -9,7 +9,7 @@ import { AuthService } from "./auth.service";
 })
 export class PlayerService {
   playerData:any;
-  playerSubject: Subject<string>;
+  playerSubject: any;
 
   constructor(
     private aFirestore: AngularFirestore,
@@ -17,7 +17,6 @@ export class PlayerService {
 
   ) {
     this.playerSubject = this.PlayerObserveInit();
-    this.playerSubject.next(this.authService.getPlayerId);
   }
 
   PlayerObserveInit(){
@@ -37,14 +36,13 @@ export class PlayerService {
           stocks: playerQuery.stocks
         }
     });
+    id$.next(this.authService.getPlayerId);
     return id$;
   }
 
   clearPlayerData(){
     this.playerData = null;
     this.playerSubject.unsubscribe();
-    console.log("CLEARED PLAYER DATA");
-    console.log("PLAYER OBSERV " +this.playerSubject.closed);
-    console.log("PLAYER DATA " + this.playerData);
+
   }
 }

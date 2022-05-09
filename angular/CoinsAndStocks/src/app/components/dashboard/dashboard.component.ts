@@ -16,12 +16,15 @@ export class DashboardComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
+    this.playerService.PlayerObserveInit();
   }
 
   onLogOut(){
-    this.authService.LogOut().then(res => {
-      this.playerService.clearPlayerData();
+    
+    this.authService.LogOut().then(() => {
+      
       this.router.navigate(['login']);
+      this.playerService.clearPlayerData();
     })
   }
 }

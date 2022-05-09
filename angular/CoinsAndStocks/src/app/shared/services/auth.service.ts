@@ -28,9 +28,6 @@ export class AuthService {
     // Log In with email/password
    LogIn(email: string, password: string) {
     return this.aFireAuth.signInWithEmailAndPassword(email, password)
-        .then((player)=>{
-          this.playerId = player.user?.uid;
-        }) 
     .catch ((error) => {
       window.alert(error.message);
     });
@@ -48,7 +45,6 @@ export class AuthService {
               coins: 100000,
               stocks: []
             }
-            this.playerId = player.user?.uid;
             this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile);
           })
       .catch((error) => {
@@ -59,7 +55,6 @@ export class AuthService {
   // Log out
    LogOut() {
     return this.aFireAuth.signOut()
-    .then(res => this.playerId = null)
     .catch((error) => {
       window.alert(error.message);
     });
