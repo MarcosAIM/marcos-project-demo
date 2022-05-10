@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Subject, switchMap } from 'rxjs';
 import { Player } from '../player';
-
+import { playerStocks, Stock } from '../stocks';
 
 @Injectable({
   providedIn: 'root'
@@ -87,7 +87,6 @@ export class AuthService {
               displayName: "Koala",
               email: player.user?.email,
               coins: 100000,
-              stocks: []
             }
             this.playerId = player.user?.uid;
             this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile)
@@ -119,4 +118,62 @@ export class AuthService {
     return this.playerId;
   }
 
+  async buyStock(stock_name:string, quantity:number){
+    if (this.isLoggedIn){
+      console.log(this.playerId);
+      const playerDocRef = this.aFirestore.collection('players').doc(this.playerId);
+      const playerStocksDocRef = playerDocRef.collection('playerStocks').doc(this.playerId + stock_name);
+      const stockDocRef = this.aFirestore.collection('stocks').doc(stock_name);
+      try{
+        await this.aFirestore.firestore.runTransaction( async (transaction)=>{
+          const playerDoc = await transaction.get(playerDocRef.ref);
+          console.log(playerDoc);
+          const stockDoc = await transaction.get(stockDocRef.ref);
+          const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
+          if (!playerDoc.exists){
+            throw 'Player does not exist :(';
+          }
+          if (!stockDoc.exists){
+            throw 'Stock does not exist :(';
+          }
+          const playerData = playerDoc.data() as Player;
+          const stockData = stockDoc.data() as Stock;
+          console.log(playerData);
+          console.log(stockData);
+          console.log(playerData.coins);
+          console.log(stockData.value);
+          const balance = playerData.coins - (stockData.value * quantity);
+          console.log(balance);
+          if(balance >= 0){
+            transaction.update(playerDocRef.ref, {coins: balance});
+            if(playerStocksDoc.exists){
+              const playerStocks = playerStocksDoc.data() as playerStocks;
+              const quantity_owned = playerStocks.quantity + quantity;
+              transaction.update(playerStocksDocRef.ref, {quantity: quantity_owned });
+            }
+            else{
+              const newStockOwned = {
+                stock_name: stockData.stock_name,
+                value: stockData.value,
+                quantity: quantity
+              }
+              transaction.set(playerStocksDocRef.ref, newStockOwned);
+            }
+            return balance;
+          }
+          else{
+            
+            return Promise.reject("Not enough coins? XD");
+          }
+        })
+      }
+      catch(error){
+        window.alert(error);
+      }
+    }
+    else{
+      return window.alert("not logged in");
+    }
+    
+  }
 }

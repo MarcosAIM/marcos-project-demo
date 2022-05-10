@@ -36,5 +36,4 @@ export class StocksService {
   lesserThan(value: number) {
     this.lesserOrEqualThanFilter$.next(value); 
   }
-
 }
