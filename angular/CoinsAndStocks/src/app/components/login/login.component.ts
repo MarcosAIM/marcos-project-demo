@@ -24,8 +24,8 @@ export class LoginComponent implements OnInit {
 
   logIn() {
     return this.authService.LogIn(this.formLogIn.value.email, this.formLogIn.value.password)
-    .then(res =>  this.router.navigateByUrl(
-      this.activeRoute.snapshot.paramMap.get('callbackUrl') || 'dashboard'))
+    .then(() =>  this.router.navigateByUrl(
+      this.activeRoute.snapshot.paramMap.get('callbackUrl') || ''))
 }
 
   ngOnInit(): void {

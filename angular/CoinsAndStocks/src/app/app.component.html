@@ -1,5 +1,15 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" class="mat-elevation-z6 toolbar">
   <span>Coins and Stocks</span>
+  <span class="topbar-separator"></span>
+  <div *ngIf="authService.playerService.playerData as player; else showLogin">
+    {{player.email}}
+    <button mat-raised-button class="toolbar-button" (click)="LogOut()">Logout</button>
+  </div>
+  <ng-template #showLogin>
+        <button mat-raised-button class="toolbar-button" routerLink="/login">Login</button>
+        <button mat-raised-button class="toolbar-button" routerLink="/register">Register</button>
+  </ng-template>
 </mat-toolbar>
-
 <router-outlet></router-outlet>
+
+

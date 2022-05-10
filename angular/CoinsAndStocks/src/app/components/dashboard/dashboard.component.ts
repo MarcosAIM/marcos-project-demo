@@ -1,30 +1,20 @@
 import { Component, Input, OnInit, NgZone } from '@angular/core';
 import { AuthService } from '../../shared/services/auth.service';
-import { PlayerService } from '../../shared/services/player.service';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { StocksService } from "../../shared/services/stocks.service";
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  columnsToDisplay = ['Name', 'Value'];
   constructor(
-    private authService: AuthService,
-    public playerService: PlayerService,
-    private ngZone: NgZone,
-    private router: Router
-    ) {}
-
-  ngOnInit(): void {
-    this.playerService.PlayerObserveInit();
-  }
-
-  onLogOut(){
-    
-    this.authService.LogOut().then(() => {
+    public authService: AuthService,
+    public stockService: StocksService
+    ) {
       
-      this.router.navigate(['login']);
-      this.playerService.clearPlayerData();
-    })
-  }
+    }
+
+  ngOnInit(): void {}
 }

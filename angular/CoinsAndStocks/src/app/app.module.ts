@@ -9,8 +9,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DashboardComponent } from "./components/dashboard/dashboard.component";
 import { LoginComponent } from "./components/login/login.component";
 import { RegisterComponent } from "./components/register/register.component";
-import { AuthService } from "./shared/services/auth.service";
 
+import { AuthService } from "./shared/services/auth.service";
 // Firebase services
 import { AngularFireModule } from '@angular/fire/compat';
 import { FireBaseModules } from "./firebase.modules";

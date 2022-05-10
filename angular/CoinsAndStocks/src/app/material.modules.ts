@@ -12,6 +12,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
     exports: [
@@ -27,7 +28,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         MatAutocompleteModule,
         MatChipsModule,
         MatProgressSpinnerModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatTableModule
     ]
   })
   export class MaterialModules {}
