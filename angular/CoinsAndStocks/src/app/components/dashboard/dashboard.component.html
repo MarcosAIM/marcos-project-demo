@@ -1,9 +1,21 @@
 <!-- Show user data when logged in -->
 <div class="row" *ngIf="authService.playerService.playerData as player">
     <p>Email: <strong>{{player.email}}</strong> Coins: <strong>{{player.coins}}</strong> </p>
+    <h1>MY STOCKS</h1>
+    <div *ngIf="authService.playerService.playerStocksData as myStocks; else loading">
+        <ul>
+        <li *ngFor="let stock of myStocks">
+            Name: {{ stock.stock_name }}
+            Value: {{stock.value}}
+            Quantity: {{stock.quantity}}
+        </li>
+        </ul>
+        <div *ngIf="myStocks.length === 0">No results, try clearing filters</div>
+    </div>
+
 </div>
 <div>
-    <h1>STOCKS</h1>
+    <h1>MARKET</h1>
     <div *ngIf="stockService.stocks$ | async; let stocks; else loading">
         <ul>
         <li *ngFor="let stock of stocks">

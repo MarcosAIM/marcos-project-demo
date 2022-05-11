@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Subject, switchMap } from 'rxjs';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreCollectionGroup } from '@angular/fire/compat/firestore';
+import { Observable, Subject, switchMap } from 'rxjs';
 import { Player } from '../player';
 import { playerStocks, Stock } from '../stocks';
 
@@ -14,12 +14,34 @@ export class AuthService {
   public playerService = new  class {
     playerData:any;
     playerSubject: any;
-  
+    playerStocksData:any;
+    playerStocksSubject:any;
+    
     constructor(public superThis: AuthService) {
       this.playerData = null;
       this.playerSubject = null;
+      this.playerStocksData = null;
+      this.playerStocksSubject = null;
      }
-  
+
+     PlayerStockObserveInit(){
+      const id$ = new Subject<string>();
+      const playerObservable = id$.pipe(
+        switchMap((id) =>{
+          return this.superThis.aFirestore.collection('players').doc(id)
+          .collection('playerStocks')
+          .valueChanges();
+        })
+      );
+      // subscribe to changes
+      playerObservable.subscribe((player) =>{
+          const playerQuery = player as unknown as playerStocks[];
+          this.playerStocksData = playerQuery;
+      });
+      id$.next(this.superThis.getPlayerId);
+      this.playerStocksSubject = id$;
+    }
+    
     PlayerObserveInit(){
       const id$ = new Subject<string>();
       const playerObservable = id$.pipe(
@@ -39,9 +61,20 @@ export class AuthService {
       });
       id$.next(this.superThis.getPlayerId);
       this.playerSubject = id$;
+      this.PlayerStockObserveInit();
+
+    }
+
+    ObserveInit(){
+      this.PlayerObserveInit();
+      this.PlayerStockObserveInit();
     }
   
     clearPlayerData(){
+      this.playerStocksData = null;
+      this.playerStocksSubject.unsubscribe();
+      this.playerStocksSubject = null;
+
       this.playerData = null;
       this.playerSubject.unsubscribe();
       this.playerSubject = null;
@@ -57,7 +90,7 @@ export class AuthService {
       next(player) {
         if (player) {
           that.playerId = player.uid;
-          that.playerService.PlayerObserveInit();
+          that.playerService.ObserveInit();
         } else {
           that.playerId = undefined;
         }
@@ -70,7 +103,7 @@ export class AuthService {
     return this.aFireAuth.signInWithEmailAndPassword(email, password)
     .then((player)=> {
       this.playerId = player.user?.uid;
-      this.playerService.PlayerObserveInit();
+      this.playerService.ObserveInit();
     })
     .catch ((error) => {
       window.alert(error.message);
@@ -90,7 +123,7 @@ export class AuthService {
             }
             this.playerId = player.user?.uid;
             this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile)
-            .then(()=> this.playerService.PlayerObserveInit());
+            .then(()=> this.playerService.ObserveInit());
           })
       .catch((error) => {
         window.alert(error.message);
@@ -110,7 +143,6 @@ export class AuthService {
   }
 
   get isLoggedIn(): boolean {
-    console.log(this.aFireAuth.currentUser);
     return (this.aFireAuth.currentUser === null) ? false : true;
   }
 
@@ -120,14 +152,12 @@ export class AuthService {
 
   async buyStock(stock_name:string, quantity:number){
     if (this.isLoggedIn){
-      console.log(this.playerId);
       const playerDocRef = this.aFirestore.collection('players').doc(this.playerId);
       const playerStocksDocRef = playerDocRef.collection('playerStocks').doc(this.playerId + stock_name);
       const stockDocRef = this.aFirestore.collection('stocks').doc(stock_name);
       try{
         await this.aFirestore.firestore.runTransaction( async (transaction)=>{
           const playerDoc = await transaction.get(playerDocRef.ref);
-          console.log(playerDoc);
           const stockDoc = await transaction.get(stockDocRef.ref);
           const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
           if (!playerDoc.exists){
@@ -138,12 +168,7 @@ export class AuthService {
           }
           const playerData = playerDoc.data() as Player;
           const stockData = stockDoc.data() as Stock;
-          console.log(playerData);
-          console.log(stockData);
-          console.log(playerData.coins);
-          console.log(stockData.value);
           const balance = playerData.coins - (stockData.value * quantity);
-          console.log(balance);
           if(balance >= 0){
             transaction.update(playerDocRef.ref, {coins: balance});
             if(playerStocksDoc.exists){
