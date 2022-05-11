@@ -188,7 +188,7 @@ export class AuthService {
           }
           else{
             
-            return Promise.reject("Not enough coins? XD");
+            return Promise.reject("Not enough coins");
           }
         })
       }
@@ -230,7 +230,7 @@ export class AuthService {
             return balance;
           }
           else{
-            return Promise.reject("Not enough coins? XD");
+            return Promise.reject("Not enough stocks to sell.");
           }
         })
       }
@@ -239,7 +239,7 @@ export class AuthService {
       }
     }
     else{
-      return window.alert("not logged in");
+      return window.alert("Not logged in");
     }
   }
 }
