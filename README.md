@@ -1,5 +1,4 @@
 # marcos-project-demo
- 
  Demo uses Angularfire to let a user buy and sell stocks.
  
  This website is for demonstration purposes only. Stocks are not real stock. and coins are not a real currency.
