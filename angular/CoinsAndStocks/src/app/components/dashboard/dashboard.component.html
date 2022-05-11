@@ -8,6 +8,7 @@
             Name: {{ stock.stock_name }}
             Value: {{stock.value}}
             Quantity: {{stock.quantity}}
+            <button (click)="authService.sellStock(stock.stock_name, 10)">Sell 10</button>
         </li>
         </ul>
         <div *ngIf="myStocks.length === 0">No results, try clearing filters</div>

@@ -199,6 +199,45 @@ export class AuthService {
     else{
       return window.alert("not logged in");
     }
-    
+  }
+  async sellStock(stock_name:string, quantity:number){
+    if (this.isLoggedIn){
+      const playerDocRef = this.aFirestore.collection('players').doc(this.playerId);
+      const playerStocksDocRef = playerDocRef.collection('playerStocks').doc(this.playerId + stock_name);
+      const stockDocRef = this.aFirestore.collection('stocks').doc(stock_name);
+      try{
+        await this.aFirestore.firestore.runTransaction( async (transaction)=>{
+          const playerDoc = await transaction.get(playerDocRef.ref);
+          const stockDoc = await transaction.get(stockDocRef.ref);
+          const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
+          if (!playerDoc.exists){
+            throw 'Player does not exist :(';
+          }
+          if (!stockDoc.exists){
+            throw 'Stock does not exist :(';
+          }
+          const playerData = playerDoc.data() as Player;
+          const stockData = stockDoc.data() as Stock;
+          const playerStockData = playerStocksDoc.data() as playerStocks;
+          const balance = playerData.coins + (stockData.value * quantity);
+          const quantity_left = playerStockData.quantity - quantity;
+          if(quantity >= 0){
+            transaction.update(playerDocRef.ref, {coins: balance});
+            transaction.update(playerStocksDocRef.ref, {quantity: quantity_left });
+            return balance;
+          }
+          else{
+            
+            return Promise.reject("Not enough coins? XD");
+          }
+        })
+      }
+      catch(error){
+        window.alert(error);
+      }
+    }
+    else{
+      return window.alert("not logged in");
+    }
   }
 }
