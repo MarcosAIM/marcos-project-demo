@@ -221,13 +221,15 @@ export class AuthService {
           const playerStockData = playerStocksDoc.data() as playerStocks;
           const balance = playerData.coins + (stockData.value * quantity);
           const quantity_left = playerStockData.quantity - quantity;
-          if(quantity >= 0){
+          if(quantity_left >= 0){
             transaction.update(playerDocRef.ref, {coins: balance});
             transaction.update(playerStocksDocRef.ref, {quantity: quantity_left });
+            if(quantity_left === 0){
+              transaction.delete(playerStocksDocRef.ref);
+            }
             return balance;
           }
           else{
-            
             return Promise.reject("Not enough coins? XD");
           }
         })
