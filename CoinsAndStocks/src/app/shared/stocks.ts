@@ -1,10 +1,8 @@
 export interface Stock{
-    stock_name: string,
+    name: string,
     value:number
 }
 
-export interface playerStocks{
-    stock_name: string,
-    value:number,
-    quantity:number,
+export interface playerStocks extends Stock {
+    quantity_owned:number,
 }

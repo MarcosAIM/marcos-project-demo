@@ -5,10 +5,10 @@
     <div *ngIf="authService.playerService.playerStocksData as myStocks; else loading">
         <ul>
         <li *ngFor="let stock of myStocks">
-            Name: {{ stock.stock_name }}
+            Name: {{ stock.name }}
             Value: {{stock.value}}
-            Quantity: {{stock.quantity}}
-            <button (click)="authService.sellStock(stock.stock_name, 10)">Sell 10</button>
+            Quantity: {{stock.quantity_owned}}
+            <button (click)="authService.sellStock(stock.name, 10)">Sell 10</button>
         </li>
         </ul>
         <div *ngIf="myStocks.length === 0">No results, try clearing filters</div>
@@ -20,10 +20,10 @@
     <div *ngIf="stockService.stocks$ | async; let stocks; else loading">
         <ul>
         <li *ngFor="let stock of stocks">
-            Name: {{ stock.stock_name }}
+            Name: {{ stock.name }}
             Value: {{stock.value}}
             <div class="row" *ngIf="authService.playerService.playerData as player">
-                <button (click)="authService.buyStock(stock.stock_name, 10)">Buy 10</button>
+                <button (click)="authService.buyStock(stock.name, 10)">Buy 10</button>
             </div>
         </li>
         </ul>

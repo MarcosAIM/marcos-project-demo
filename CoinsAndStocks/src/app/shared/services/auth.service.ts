@@ -23,8 +23,31 @@ export class AuthService {
       this.playerStocksData = null;
       this.playerStocksSubject = null;
      }
+    
+    // Observe all the changes in player Data: coins and email.
+    private PlayerObserveInit(){
+      const id$ = new Subject<string>();
+      const playerObservable = id$.pipe(
+        switchMap((id) =>{
+          return this.superThis.aFirestore.collection('players').doc(id).valueChanges();
+        })
+      );
+      // subscribe to changes
+      playerObservable.subscribe((player) =>{
+          const playerQuery = player as unknown as Player;
+          this.playerData = {
+            coins: playerQuery.coins,
+            email: playerQuery.email,
+          }
+      });
+      id$.next(this.superThis.getPlayerId);
+      this.playerSubject = id$;
+      this.PlayerStockObserveInit();
 
-     PlayerStockObserveInit(){
+    }
+
+    // Observe all the changes in player stocks subcollection: all the stocks the player owns.
+    private PlayerStockObserveInit(){
       const id$ = new Subject<string>();
       const playerObservable = id$.pipe(
         switchMap((id) =>{
@@ -41,40 +64,18 @@ export class AuthService {
       id$.next(this.superThis.getPlayerId);
       this.playerStocksSubject = id$;
     }
-    
-    PlayerObserveInit(){
-      const id$ = new Subject<string>();
-      const playerObservable = id$.pipe(
-        switchMap((id) =>{
-          return this.superThis.aFirestore.collection('players').doc(id).valueChanges();
-        })
-      );
-      // subscribe to changes
-      playerObservable.subscribe((player) =>{
-          const playerQuery = player as unknown as Player;
-          this.playerData = {
-            coins: playerQuery.coins,
-            email: playerQuery.email,
-            displayName: playerQuery.displayName,
-            stocks: playerQuery.stocks
-          }
-      });
-      id$.next(this.superThis.getPlayerId);
-      this.playerSubject = id$;
-      this.PlayerStockObserveInit();
 
-    }
-
-    ObserveInit(){
+    // initialize both observers for login, registration, and revisiting website while logged in.
+    public ObserveInit(){
       this.PlayerObserveInit();
       this.PlayerStockObserveInit();
     }
-  
-    clearPlayerData(){
+
+    // clear both observers for Logging out
+    public clearPlayerData(){
       this.playerStocksData = null;
       this.playerStocksSubject.unsubscribe();
       this.playerStocksSubject = null;
-
       this.playerData = null;
       this.playerSubject.unsubscribe();
       this.playerSubject = null;
@@ -98,7 +99,6 @@ export class AuthService {
     });
    }
 
-    // Log In with email/password
    LogIn(email: string, password: string) {
     return this.aFireAuth.signInWithEmailAndPassword(email, password)
     .then((player)=> {
@@ -110,16 +110,14 @@ export class AuthService {
     });
   }
 
-    // Register with email/password
     Register(email: string, password: string) {
       return this.aFireAuth
           .createUserWithEmailAndPassword(email, password)
           .then((player)=>{
             const newPlayerProfile = {
               player_id: player.user?.uid,
-              displayName: "Koala",
               email: player.user?.email,
-              coins: 100000,
+              coins: 1000000,
             }
             this.playerId = player.user?.uid;
             this.aFirestore.collection('players').doc(player.user?.uid).set(newPlayerProfile)
@@ -130,7 +128,6 @@ export class AuthService {
       });
     }
 
-  // Log out
    LogOut() {
     return this.aFireAuth.signOut()
     .then(()=>{
@@ -173,14 +170,13 @@ export class AuthService {
             transaction.update(playerDocRef.ref, {coins: balance});
             if(playerStocksDoc.exists){
               const playerStocks = playerStocksDoc.data() as playerStocks;
-              const quantity_owned = playerStocks.quantity + quantity;
-              transaction.update(playerStocksDocRef.ref, {quantity: quantity_owned });
+              transaction.update(playerStocksDocRef.ref, {quantity_owned: playerStocks.quantity_owned + quantity});
             }
             else{
               const newStockOwned = {
-                stock_name: stockData.stock_name,
+                name: stockData.name,
                 value: stockData.value,
-                quantity: quantity
+                quantity_owned: quantity
               }
               transaction.set(playerStocksDocRef.ref, newStockOwned);
             }
@@ -220,10 +216,10 @@ export class AuthService {
           const stockData = stockDoc.data() as Stock;
           const playerStockData = playerStocksDoc.data() as playerStocks;
           const balance = playerData.coins + (stockData.value * quantity);
-          const quantity_left = playerStockData.quantity - quantity;
+          const quantity_left = playerStockData.quantity_owned - quantity;
           if(quantity_left >= 0){
             transaction.update(playerDocRef.ref, {coins: balance});
-            transaction.update(playerStocksDocRef.ref, {quantity: quantity_left });
+            transaction.update(playerStocksDocRef.ref, {quantity_owned: quantity_left });
             if(quantity_left === 0){
               transaction.delete(playerStocksDocRef.ref);
             }
