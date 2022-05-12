@@ -8,7 +8,7 @@
             Name: {{ stock.name }}
             Value: {{stock.value}}
             Quantity: {{stock.quantity_owned}}
-            <button (click)="authService.sellStock(stock.name, 10)">Sell 10</button>
+            <button (click)="authService.sellStock(stock.name, 10, stock.value)">Sell 10</button>
         </li>
         </ul>
         <div *ngIf="myStocks.length === 0">No results, try clearing filters</div>
@@ -32,4 +32,6 @@
 </div>
 
 <ng-template #loading>Loading&hellip;</ng-template>
+
+<footer>not a real market, not a real currency</footer>
 

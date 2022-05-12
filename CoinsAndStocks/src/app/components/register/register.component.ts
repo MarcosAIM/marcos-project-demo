@@ -27,7 +27,7 @@ export class RegisterComponent implements OnInit {
   register() {
     this.authService.Register(this.formRegister.value.email, this.formRegister.value.password)
     .then(res =>  this.router.navigateByUrl(
-      this.activeRoute.snapshot.paramMap.get('callbackUrl') || 'dashboard'))
+      this.activeRoute.snapshot.paramMap.get('callbackUrl') || ''))
   }
 
   ngOnInit(): void {

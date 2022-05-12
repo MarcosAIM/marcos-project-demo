@@ -150,40 +150,44 @@ export class AuthService {
   async buyStock(stock_name:string, quantity:number){
     if (this.isLoggedIn){
       const playerDocRef = this.aFirestore.collection('players').doc(this.playerId);
-      const playerStocksDocRef = playerDocRef.collection('playerStocks').doc(this.playerId + stock_name);
       const stockDocRef = this.aFirestore.collection('stocks').doc(stock_name);
       try{
         await this.aFirestore.firestore.runTransaction( async (transaction)=>{
           const playerDoc = await transaction.get(playerDocRef.ref);
           const stockDoc = await transaction.get(stockDocRef.ref);
-          const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
           if (!playerDoc.exists){
             throw 'Player does not exist :(';
           }
-          if (!stockDoc.exists){
+          else if (!stockDoc.exists){
             throw 'Stock does not exist :(';
           }
           const playerData = playerDoc.data() as Player;
           const stockData = stockDoc.data() as Stock;
+
           const balance = playerData.coins - (stockData.value * quantity);
+
+          const playerStocksDocRef = playerDocRef.collection('playerStocks')
+          .doc(this.playerId + stock_name + stockData.value);
+          const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
+          
           if(balance >= 0){
-            transaction.update(playerDocRef.ref, {coins: balance});
+            transaction.update(playerDocRef.ref, {coins: balance}); // update new balance of coins
+            var quantity_owned = quantity;
             if(playerStocksDoc.exists){
               const playerStocks = playerStocksDoc.data() as playerStocks;
-              transaction.update(playerStocksDocRef.ref, {quantity_owned: playerStocks.quantity_owned + quantity});
+              quantity_owned += playerStocks.quantity_owned;
             }
-            else{
-              const newStockOwned = {
-                name: stockData.name,
-                value: stockData.value,
-                quantity_owned: quantity
-              }
-              transaction.set(playerStocksDocRef.ref, newStockOwned);
+            const newStockOwned = {
+              name: stockData.name,
+              value: stockData.value,
+              quantity_owned: quantity_owned
             }
+            transaction.set(playerStocksDocRef.ref, newStockOwned);
+            const new_stock_price = stockData.value + (stockData.increasePerShare * quantity);
+            transaction.update(stockDocRef.ref, {value:new_stock_price});
             return balance;
           }
           else{
-            
             return Promise.reject("Not enough coins");
           }
         })
@@ -196,10 +200,11 @@ export class AuthService {
       return window.alert("not logged in");
     }
   }
-  async sellStock(stock_name:string, quantity:number){
+  async sellStock(stock_name:string, quantity:number, value:number){
     if (this.isLoggedIn){
       const playerDocRef = this.aFirestore.collection('players').doc(this.playerId);
-      const playerStocksDocRef = playerDocRef.collection('playerStocks').doc(this.playerId + stock_name);
+      const playerStocksDocRef = playerDocRef.collection('playerStocks')
+      .doc(this.playerId + stock_name + value);
       const stockDocRef = this.aFirestore.collection('stocks').doc(stock_name);
       try{
         await this.aFirestore.firestore.runTransaction( async (transaction)=>{
@@ -207,19 +212,35 @@ export class AuthService {
           const stockDoc = await transaction.get(stockDocRef.ref);
           const playerStocksDoc = await transaction.get(playerStocksDocRef.ref);
           if (!playerDoc.exists){
-            throw 'Player does not exist :(';
+            throw 'Player does not exist. :(';
           }
           if (!stockDoc.exists){
-            throw 'Stock does not exist :(';
+            throw 'Stock does not exist. :(';
+          }
+          if(!playerStocksDoc.exists){
+            throw 'Do not own this stock. :(';
           }
           const playerData = playerDoc.data() as Player;
           const stockData = stockDoc.data() as Stock;
-          const playerStockData = playerStocksDoc.data() as playerStocks;
-          const balance = playerData.coins + (stockData.value * quantity);
-          const quantity_left = playerStockData.quantity_owned - quantity;
+          const playerStocks = playerStocksDoc.data() as playerStocks;
+          const playerStocksData = playerStocksDoc.data() as playerStocks;
+          var balance;
+
+          const profit = ((stockData.increasePerShare * quantity)  * quantity);
+          balance = playerData.coins + ((stockData.value * quantity)) - profit;
+            
+          console.log(stockData.value);
+          console.log(playerStocksData.value);
+          console.log(stockData.increasePerShare);
+          console.log(quantity);
+          console.log(balance);
+          
+          const quantity_left = playerStocksData.quantity_owned - quantity;
           if(quantity_left >= 0){
             transaction.update(playerDocRef.ref, {coins: balance});
             transaction.update(playerStocksDocRef.ref, {quantity_owned: quantity_left });
+            const new_stock_price = stockData.value - (stockData.increasePerShare * quantity);
+            transaction.update(stockDocRef.ref, {value:new_stock_price} );
             if(quantity_left === 0){
               transaction.delete(playerStocksDocRef.ref);
             }

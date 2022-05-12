@@ -1,6 +1,8 @@
 <mat-toolbar color="primary" class="mat-elevation-z6 toolbar">
   <span>Coins and Stocks</span>
+  
   <span class="topbar-separator"></span>
+  <span>|DEMO ONLY|DO NOT USE REAL EMAIL OR PASSWORD|</span>
   <div *ngIf="authService.playerService.playerData as player; else showLogin">
     {{player.email}}
     <button mat-raised-button class="toolbar-button" (click)="LogOut()">Logout</button>

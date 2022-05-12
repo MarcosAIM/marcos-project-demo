@@ -1,6 +1,7 @@
 export interface Stock{
     name: string,
-    value:number
+    value:number,
+    increasePerShare:number;
 }
 
 export interface playerStocks extends Stock {
