@@ -12,16 +12,8 @@
         <input matInput type="password" formControlName="password">
       </mat-form-field>
   </div>
-  <div>
-      <mat-form-field appearance="outline">
-        <mat-label>Confirm Password</mat-label>
-          <input matInput type="password" formControlName="confirm">
-        </mat-form-field>
-    </div>
-
   <button mat-raised-button (click)="register()">Register</button>
 </form>
-
 <div class="redirectToLogin">
   <span>Already have an account?
     <span class="redirect" routerLink="/login">Log In</span>
