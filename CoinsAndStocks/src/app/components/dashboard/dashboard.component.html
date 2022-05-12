@@ -11,7 +11,7 @@
             <button (click)="authService.sellStock(stock.name, 10, stock.value)">Sell 10</button>
         </li>
         </ul>
-        <div *ngIf="myStocks.length === 0">No results, try clearing filters</div>
+        <div *ngIf="myStocks.length === 0">No Stocks Owned.</div>
     </div>
 
 </div>
@@ -27,7 +27,7 @@
             </div>
         </li>
         </ul>
-        <div *ngIf="stocks.length === 0">No results, try clearing filters</div>
+        <div *ngIf="stocks.length === 0">No stocks here...</div>
     </div>
 </div>
 

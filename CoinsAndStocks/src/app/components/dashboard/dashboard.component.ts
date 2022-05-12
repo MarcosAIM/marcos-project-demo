@@ -12,9 +12,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public stockService: StocksService
-    ) {
-      
-    }
+    ) { }
 
   ngOnInit(): void {}
 }

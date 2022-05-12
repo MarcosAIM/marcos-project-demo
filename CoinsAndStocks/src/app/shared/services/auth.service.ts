@@ -163,7 +163,6 @@ export class AuthService {
           }
           const playerData = playerDoc.data() as Player;
           const stockData = stockDoc.data() as Stock;
-
           const balance = playerData.coins - (stockData.value * quantity);
 
           const playerStocksDocRef = playerDocRef.collection('playerStocks')
@@ -222,18 +221,12 @@ export class AuthService {
           }
           const playerData = playerDoc.data() as Player;
           const stockData = stockDoc.data() as Stock;
-          const playerStocks = playerStocksDoc.data() as playerStocks;
           const playerStocksData = playerStocksDoc.data() as playerStocks;
           var balance;
 
-          const profit = ((stockData.increasePerShare * quantity)  * quantity);
+          //profit from buying stock and increasing value
+          const profit = ((stockData.increasePerShare * quantity)  * quantity); 
           balance = playerData.coins + ((stockData.value * quantity)) - profit;
-            
-          console.log(stockData.value);
-          console.log(playerStocksData.value);
-          console.log(stockData.increasePerShare);
-          console.log(quantity);
-          console.log(balance);
           
           const quantity_left = playerStocksData.quantity_owned - quantity;
           if(quantity_left >= 0){

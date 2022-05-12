@@ -6,7 +6,6 @@ import { RegisterComponent } from "./components/register/register.component";
 import { canActivate, redirectLoggedInTo, redirectUnauthorizedTo  } from '@angular/fire/compat/auth-guard';
 
 const redirectLoggedInToDashboard = () => redirectLoggedInTo(['dashboard']);
-const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
