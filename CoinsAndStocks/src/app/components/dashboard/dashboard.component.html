@@ -30,8 +30,24 @@
         <div *ngIf="stocks.length === 0">No stocks here...</div>
     </div>
 </div>
+<footer>not a real market, not a real currency</footer>
+
+<div class="row" *ngIf="authService.playerService.playerData as player">
+    <div>
+        <h1>LeaderBoard</h1>
+        <div *ngIf="playerService.playersLeaderboard$ | async; let playersLeaderboard; else loading">
+            <ul>
+            <li *ngFor="let players of playersLeaderboard">
+                Name: {{ players.email }}
+                Value: {{players.coins}}
+            </li>
+            </ul>
+            <div *ngIf="playersLeaderboard.length === 0">No players here...</div>
+        </div>
+    </div>
+</div>
 
 <ng-template #loading>Loading&hellip;</ng-template>
 
-<footer>not a real market, not a real currency</footer>
+
 

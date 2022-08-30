@@ -1,22 +1,24 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+// components
+import { AppComponent } from './app.component';
 import { DashboardComponent } from "./components/dashboard/dashboard.component";
 import { LoginComponent } from "./components/login/login.component";
 import { RegisterComponent } from "./components/register/register.component";
 
+// auth Service
 import { AuthService } from "./shared/services/auth.service";
+
 // Firebase services
 import { AngularFireModule } from '@angular/fire/compat';
 import { FireBaseModules } from "./firebase.modules";
+
 // material modules
 import { MaterialModules } from "./material.modules";
-
 
 
 @NgModule({
@@ -24,7 +26,7 @@ import { MaterialModules } from "./material.modules";
     AppComponent,
     DashboardComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
   ],
   imports: [
     AppRoutingModule,
