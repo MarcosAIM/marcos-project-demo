@@ -1,7 +1,7 @@
 <!-- Show user data when logged in -->
 <div class="row" *ngIf="authService.playerService.playerData as player">
     <p>Email: <strong>{{player.email}}</strong> Coins: <strong>{{player.coins}}</strong> </p>
-    <h1>MY STOCKS</h1>
+    <h1>My Stocks</h1>
     <div *ngIf="authService.playerService.playerStocksData as myStocks; else loading">
         <ul>
         <li *ngFor="let stock of myStocks">
@@ -16,12 +16,12 @@
 
 </div>
 <div>
-    <h1>MARKET</h1>
+    <h1>Market</h1>
     <div *ngIf="stockService.stocks$ | async; let stocks; else loading">
         <ul>
         <li *ngFor="let stock of stocks">
-            Name: {{ stock.name }}
-            Value: {{stock.value}}
+            <div>Name: {{ stock.name }} </div>
+            <div>Value: {{stock.value}}</div>
             <div class="row" *ngIf="authService.playerService.playerData as player">
                 <button (click)="authService.buyStock(stock.name, 10)">Buy 10</button>
             </div>
@@ -38,8 +38,8 @@
         <div *ngIf="playerService.playersLeaderboard$ | async; let playersLeaderboard; else loading">
             <ul>
             <li *ngFor="let players of playersLeaderboard">
-                Name: {{ players.email }}
-                Value: {{players.coins}}
+                <div>Name: {{ players.email }}</div>
+                <div>Coins: {{players.coins}}</div>
             </li>
             </ul>
             <div *ngIf="playersLeaderboard.length === 0">No players here...</div>
